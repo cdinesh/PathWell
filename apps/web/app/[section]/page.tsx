@@ -1,0 +1,6 @@
+import { notFound } from "next/navigation";
+import { AppShell } from "../../components/AppShell";
+import { AdvisorStrip, MetricCard, PageHeader } from "../../components/Cards";
+import { sectionContent } from "../../lib/data";
+
+export default async function SectionPage({ params }: { params: Promise<{ section: string }> }) { const { section } = await params; const content = sectionContent[section]; if (!content) notFound(); return <AppShell><main className="page"><PageHeader eyebrow={content.eyebrow} title={content.title} description={content.description}/><section className="metric-grid three">{content.metrics.map(metric => <MetricCard key={metric.label} {...metric}/>)}</section><section className="panel domain-panel"><div><p className="eyebrow">PERSONALIZED OVERVIEW</p><h2>{content.title} priorities</h2><p>This Week 1 experience uses Alex Morgan’s seeded profile and deterministic provider data. Connect a production provider in Week 2 for current information.</p></div><div className="status-list"><p><span>✓</span> Personalized profile context</p><p><span>✓</span> Shared goal awareness</p><p><span>✓</span> Explainable mock insights</p><p><span>○</span> Live provider <small>Week 2</small></p></div></section><AdvisorStrip prompt={content.prompt}/></main></AppShell>; }
