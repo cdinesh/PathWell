@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: pathwell-api-cdinesh
+    runtime: python
+    plan: free
+    region: oregon
+    autoDeploy: true
+    buildCommand: pip install -e apps/api
+    startCommand: alembic -c alembic.ini upgrade head && python -m thrive.seed && uvicorn thrive.main:app --app-dir apps/api --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pathwell-db-cdinesh
+          property: connectionString
+      - key: WEB_ORIGIN
+        value: https://pathwell-app-cdinesh.onrender.com
+      - key: NEWS_API_KEY
+        sync: false
+
+  - type: web
+    name: pathwell-app-cdinesh
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: apps/web
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.0
+      - key: NEXT_PUBLIC_API_URL
+        value: https://pathwell-api-cdinesh.onrender.com
+
+databases:
+  - name: pathwell-db-cdinesh
+    plan: free
+    region: oregon
+    databaseName: pathwell
+    user: pathwell
+
