@@ -6,6 +6,8 @@ PathWell is an AI-powered personal decision assistant that helps people connect 
 
 This repository contains the PathWell MVP: a Next.js web application, a FastAPI API, and a local SQLite database with an optional PostgreSQL and Redis development stack.
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/cdinesh/PathWell)
+
 ## What you can do
 
 - Create an account, complete onboarding, or enter with the seeded demo profile.
@@ -280,7 +282,27 @@ Confirm `NEWS_API_KEY` is present in the root `.env`, restart the API, and check
 
 ## Production deployment
 
-PathWell has two deployable services:
+### One-click Render deployment
+
+The root [`render.yaml`](render.yaml) Blueprint deploys the complete application:
+
+- `pathwell-app-cdinesh`: public Next.js web application
+- `pathwell-api-cdinesh`: public FastAPI service
+- `pathwell-db-cdinesh`: managed PostgreSQL database
+
+Click **Deploy to Render** near the top of this README, sign in to Render, and approve the Blueprint. Render will ask for `NEWS_API_KEY`; it can be left blank initially and added later from the API service's **Environment** page.
+
+The API automatically applies Alembic migrations and seeds the demo profile every time it starts. After the deployment completes, open:
+
+- Application: `https://pathwell-app-cdinesh.onrender.com`
+- API documentation: `https://pathwell-api-cdinesh.onrender.com/docs`
+- API health check: `https://pathwell-api-cdinesh.onrender.com/health`
+
+Every push to the GitHub `main` branch automatically redeploys the affected service. Render's free web services can spin down while idle, so the first application or API request after inactivity might take longer. Choose a paid instance in Render if the application must remain continuously warm.
+
+### Other hosting providers
+
+PathWell has two deployable application services:
 
 1. Deploy `apps/api` to a Python-capable host and run database migrations during release.
 2. Deploy `apps/web` to a Next.js-capable host.
