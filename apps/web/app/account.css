@@ -1,0 +1,56 @@
+.account-menu {
+  position: relative;
+}
+
+.account-trigger {
+  border: 0;
+  cursor: pointer;
+}
+
+.account-trigger:hover,
+.account-trigger[aria-expanded="true"] {
+  background: #c5dacd;
+}
+
+.account-dropdown {
+  position: absolute;
+  right: 0;
+  top: 46px;
+  width: 190px;
+  padding: 10px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.account-dropdown div {
+  padding: 7px 9px 10px;
+}
+
+.account-dropdown b,
+.account-dropdown small {
+  display: block;
+  font-size: 12px;
+}
+
+.account-dropdown small {
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.account-dropdown button {
+  width: 100%;
+  padding: 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.account-dropdown button:hover {
+  background: #fae9e7;
+}
