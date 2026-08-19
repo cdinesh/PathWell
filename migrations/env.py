@@ -4,12 +4,13 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from thrive import models  # noqa: F401
 from thrive.config import settings
-from thrive.database import Base
+from thrive.database import Base, normalize_database_url
 
 config = context.config
 if config.config_file_name:
     fileConfig(config.config_file_name)
-config.set_main_option("sqlalchemy.url", settings().database_url.replace("%", "%%"))
+database_url = normalize_database_url(settings().database_url)
+config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
 target_metadata = Base.metadata
 
 
