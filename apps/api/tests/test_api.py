@@ -134,6 +134,72 @@ def test_news_rejects_unknown_category(client):
     assert client.get("/news/headlines?category=sports").status_code == 422
 
 
+def test_news_uses_a_verified_ca_bundle(client, monkeypatch):
+    import ssl
+
+    from thrive import providers
+    from thrive.config import settings
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def read(self):
+            return b'{"articles": []}'
+
+    captured = {}
+
+    def fake_urlopen(request, **kwargs):
+        captured["url"] = request.full_url
+        captured.update(kwargs)
+        return FakeResponse()
+
+    monkeypatch.setattr(settings(), "news_api_key", "test-key")
+    monkeypatch.setattr(providers, "urlopen", fake_urlopen)
+
+    response = client.get("/news/headlines?category=ai")
+
+    assert response.status_code == 200
+    assert captured["timeout"] == 8
+    assert captured["context"].verify_mode == ssl.CERT_REQUIRED
+    assert captured["context"].check_hostname is True
+    assert "/v2/everything?" in captured["url"]
+    assert "sortBy=publishedAt" in captured["url"]
+
+
+def test_business_news_uses_top_headlines(client, monkeypatch):
+    from thrive import providers
+    from thrive.config import settings
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def read(self):
+            return b'{"articles": []}'
+
+    captured = {}
+
+    def fake_urlopen(request, **kwargs):
+        captured["url"] = request.full_url
+        return FakeResponse()
+
+    monkeypatch.setattr(settings(), "news_api_key", "test-key")
+    monkeypatch.setattr(providers, "urlopen", fake_urlopen)
+
+    response = client.get("/news/headlines?category=business")
+
+    assert response.status_code == 200
+    assert "/v2/top-headlines?" in captured["url"]
+    assert "category=business" in captured["url"]
+
+
 def test_trip_plan_reacts_to_weather_and_delay(client):
     base = {
         "destination": "Italy",

@@ -6,6 +6,10 @@ PathWell is an AI-powered personal decision assistant that helps people connect 
 
 This repository contains the PathWell MVP: a Next.js web application, a FastAPI API, and a local SQLite database with an optional PostgreSQL and Redis development stack.
 
+PathWell addresses a real-world problem: people often manage financial plans, career development, travel decisions, investments, and personal goals across disconnected applications, making it difficult to understand how one decision affects another. The platform brings this information into a unified AI-assisted workspace that helps users compare options, identify trade-offs, coordinate competing priorities, and make clearer decisions without immediately handing control to automated systems. This creates business value through improved customer engagement, personalized guidance, cross-domain insights, and a foundation for future financial, career, travel, and lifestyle service integrations.
+
+> **Demo access:** On the signup screen, select **Use demo account** to explore the complete seeded PathWell experience without creating an account.
+
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/cdinesh/PathWell)
 
 ## What you can do

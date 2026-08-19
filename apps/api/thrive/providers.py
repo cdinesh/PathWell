@@ -1,9 +1,12 @@
 import json
+import ssl
 from datetime import UTC, datetime
 from typing import Literal, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+
+import certifi
 
 from .config import settings
 from .travel_catalog import ITALY_DAYS
@@ -32,29 +35,53 @@ class NewsProviderError(RuntimeError):
 
 
 class NewsApiProvider:
-    endpoint = "https://newsapi.org/v2/top-headlines"
+    headlines_endpoint = "https://newsapi.org/v2/top-headlines"
+    everything_endpoint = "https://newsapi.org/v2/everything"
 
     def headlines(self, category: NewsCategory) -> dict:
         api_key = settings().news_api_key
         if not api_key:
             raise NewsProviderError("Real-time news is not configured. Add NEWS_API_KEY to .env.")
+        endpoint = self.headlines_endpoint
         parameters: dict[str, str | int] = {"country": "us", "pageSize": 30}
         if category == "technology":
             parameters["category"] = "technology"
         elif category in {"health", "business"}:
             parameters["category"] = category
         elif category == "ai":
-            parameters.update({"category": "technology", "q": "AI OR artificial intelligence"})
+            endpoint = self.everything_endpoint
+            parameters = {
+                "q": '("artificial intelligence" OR OpenAI OR ChatGPT OR "machine learning")',
+                "searchIn": "title,description",
+                "language": "en",
+                "sortBy": "publishedAt",
+                "pageSize": 30,
+            }
         elif category == "finance":
-            parameters.update({"category": "business", "q": "finance OR markets OR economy"})
+            endpoint = self.everything_endpoint
+            parameters = {
+                "q": '(finance OR markets OR economy OR investing)',
+                "searchIn": "title,description",
+                "language": "en",
+                "sortBy": "publishedAt",
+                "pageSize": 30,
+            }
         elif category == "politics":
-            parameters["q"] = "politics OR government"
+            endpoint = self.everything_endpoint
+            parameters = {
+                "q": '(politics OR government OR congress OR election)',
+                "searchIn": "title,description",
+                "language": "en",
+                "sortBy": "publishedAt",
+                "pageSize": 30,
+            }
         request = Request(
-            f"{self.endpoint}?{urlencode(parameters)}",
+            f"{endpoint}?{urlencode(parameters)}",
             headers={"X-Api-Key": api_key, "User-Agent": "PathWell/0.1"},
         )
         try:
-            with urlopen(request, timeout=8) as response:
+            tls_context = ssl.create_default_context(cafile=certifi.where())
+            with urlopen(request, timeout=8, context=tls_context) as response:
                 payload = json.load(response)
         except (HTTPError, URLError, TimeoutError) as error:
             raise NewsProviderError(f"News provider request failed: {error}") from error
